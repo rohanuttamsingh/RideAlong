@@ -11,11 +11,12 @@ def get_distance(university, destination):
     """
 
     # Get the distance from the google maps API
-    url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={0}&destinations={1}&key={2}'.format(university, destination, API_KEY)
+    url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={0}&destinations={1}&key={2}'.format('%7C'.join(university), '%7C'.join(destination), API_KEY)
     response = requests.get(url)
     data = response.json()
+    return data
     distance = data['rows'][0]['elements'][0]['duration']['value']
 
     return distance
 
-get_distance("University of California, Berkeley", "San Francisco, CA")
+print(get_distance(["University of California, Berkeley", "Stanford University"], ["San Francisco, CA", "College Park, MD"]))
