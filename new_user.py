@@ -6,7 +6,6 @@ import requests
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from twilio.rest import Client
 
 load_dotenv()
 API_KEY = os.environ["API_KEY"]
@@ -85,38 +84,18 @@ def get_distance_matrix(origin: str, destinations: List[str]):
     data = response.json()
     return data
 
-def text_match(user: User, match: User, minutes: int):
-    message = f'{user.name}, CoRide found a match!'
-    if match.type == Type.DRIVER:
-        action = 'is driving'
-    else:
-        action = 'needs a ride'
-    message += f' {match.name} {action} to {match.destination}, which is only {minutes} away from your destination, {user.destination}.'
-    message += f' Connect with {match.name} at {match.phone}.'
-    number = '+1' + user.phone
-    send_text(number, message)
+def send_request(message, to_number):
+    url = f'https://api.twilio.com/2010-04-01/Accounts/{ACCOUNT_TOKEN}/Messages.json'
+    payload = {
+        'Body': message,
+        'From': '+18339642490',
+        'To': to_number
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    response = requests.request("POST", url, headers=headers, data=payload, auth=(ACCOUNT_TOKEN, AUTH_TOKEN))
+    print(response.text)
 
-def text_no_match(user: User):
-    message = f"{user.name}, thanks for signing up for CoRide! We'll let you know when we find a match."
-    number = '+1' + user.phone
-    send_text(number, message)
-
-def send_text(number: str, message: str):
-    """
-    Sends a text message to number with body message
-    Number must be a string and have +1 in front of it
-    ex. +16677015404
-    """
-    client = Client(ACCOUNT_TOKEN, AUTH_TOKEN)
-    message = client.messages.create(
-        body=message,
-        from_="+18339642490",
-        to=number
-    )
-    print(message.sid)
-
-# print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
-# handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'New York, NY', None))
-# handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'Scranton, PA', None))
-# print(get_users())
-print(get_users_list())
+def lambda_handler(*args, **kwargs):
+    handle_new_user()
