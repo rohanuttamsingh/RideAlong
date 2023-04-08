@@ -48,11 +48,12 @@ def handle_new_user(user: User):
         if duration < min_duration:
             idx, min_duration = i, duration
     if min_duration > 60: # No matches within 1 hour
-        return
-    match = possible_matches[idx]
-    minutes = duration // 60
-    text_match(user, match, minutes)
-    text_match(match, user, minutes)
+        text_no_match(user)
+    else:
+        match = possible_matches[idx]
+        minutes = duration // 60
+        text_match(user, match, minutes)
+        text_match(match, user, minutes)
 
 def get_distance_matrix(origin: str, destinations: List[str]):
     """
@@ -72,6 +73,11 @@ def text_match(user: User, match: User, minutes: int):
         action = 'needs a ride'
     message += f' {match.name} {action} to {match.destination}, which is only {minutes} away from your destination, {user.destination}.'
     message += f' Connect with {match.name} at {match.phone}.'
+    number = '+1' + user.phone
+    send_text(number, message)
+
+def text_no_match(user: User):
+    message = f"{user.name}, thanks for signing up for CoRide! We'll let you know when we find a match."
     number = '+1' + user.phone
     send_text(number, message)
 
