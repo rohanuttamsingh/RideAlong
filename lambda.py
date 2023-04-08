@@ -1,9 +1,12 @@
 import requests
 import os
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 load_dotenv()
 API_KEY = os.environ["API_KEY"]
+ACCOUNT_TOKEN = os.environ["ACCOUNT_TOKEN"]
+AUTH_TOKEN = os.environ["AUTH_TOKEN"]
 
 SCHOOL_ABBREVIATION_TO_NAME = {
     "UMD": "University of Maryland, College Park",
@@ -35,4 +38,19 @@ def get_distance(university, destination):
 
     return distance
 
+def send_text(number, message):
+    """
+    Sends a text message to number with body message
+    Number must be a string and have +1 in front of it
+    ex. +16677015404
+    """
+    client = Client(ACCOUNT_TOKEN, AUTH_TOKEN)
+    message = client.messages.create(
+    body=message,
+    from_="+18339642490",
+    to=number
+    )
+    print(message.sid)
+
 print(get_distance(["University of California, Berkeley", "Stanford University"], ["San Francisco, CA", "College Park, MD"]))
+send_text("+16677015404", "Hi, from twilio and bitcamp")
