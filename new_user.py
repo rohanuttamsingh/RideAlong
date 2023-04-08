@@ -6,8 +6,6 @@ import requests
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from utils import send_text
-from twilio.rest import Client
 
 load_dotenv()
 API_KEY = os.environ["API_KEY"]
@@ -39,10 +37,13 @@ def get_users() -> pd.DataFrame:
 def create_user_from_row(row) -> User:
     type = Type.RIDER if row['Type'] == 'Rider' else Type.DRIVER
     seats = row['Seats'] if not pd.isna(row['Seats']) else None
-    date_list = row['Date'].split('/')
-    month, day, year = map(lambda i: int(i), date_list)
-    year += 2000
-    date = datetime.date(year, month, day)
+    if not pd.isna(row['Date']):
+        date_list = row['Date'].split('/')
+        month, day, year = map(lambda i: int(i), date_list)
+        year += 2000
+        date = datetime.date(year, month, day)
+    else:
+        date = None
     return User(type, row['Name'], row['Phone'], row['School'], row['Destination'], seats, date)
 
 def get_users_list() -> List[User]:
@@ -57,8 +58,8 @@ def handle_new_user():
     users = get_users_list()
     user = users[-1]
     users = users[:-1]
-    # Possible matches are the opposite type, from same university, and are traveling within 1 day
-    cond = lambda u: u.type != user.type and u.university == user.university and abs((u.date - user.date).days) <= 1
+    # Possible matches are the opposite type and are from same university
+    cond = lambda u: u.type != user.type and u.university == user.university
     possible_matches = list(filter(cond, users))
     match_destinations = [match.destination for match in possible_matches]
     distance_matrix = get_distance_matrix(user.destination, match_destinations)
@@ -72,8 +73,6 @@ def handle_new_user():
     else:
         match = possible_matches[idx]
         minutes = duration // 60
-        # text_match(user, match, minutes)
-        # text_match(match, user, minutes)
         print(user, match, minutes)
 
 def get_distance_matrix(origin: str, destinations: List[str]):
@@ -86,19 +85,18 @@ def get_distance_matrix(origin: str, destinations: List[str]):
     data = response.json()
     return data
 
-def text_match(user: User, match: User, minutes: int):
-    message = f'{user.name}, CoRide found a match!'
-    if match.type == Type.DRIVER:
-        action = 'is driving'
-    else:
-        action = 'needs a ride'
-    message += f' {match.name} {action} to {match.destination}, which is only {minutes} away from your destination, {user.destination}.'
-    message += f' Connect with {match.name} at {match.phone}.'
-    number = '+1' + user.phone
-    send_text(number, message)
+def send_request(message, to_number):
+    url = f'https://api.twilio.com/2010-04-01/Accounts/{ACCOUNT_TOKEN}/Messages.json'
+    payload = {
+        'Body': message,
+        'From': '+18339642490',
+        'To': to_number
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    response = requests.request("POST", url, headers=headers, data=payload, auth=(ACCOUNT_TOKEN, AUTH_TOKEN))
+    print(response.text)
 
-# print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
-# handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'New York, NY', None))
-# handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'Scranton, PA', None))
-# print(get_users())
-# print(get_users_list())
+def lambda_handler(*args, **kwargs):
+    handle_new_user()
