@@ -47,6 +47,8 @@ def handle_new_user(user: User):
     for i, duration in enumerate(durations):
         if duration < min_duration:
             idx, min_duration = i, duration
+    if min_duration > 60: # No matches within 1 hour
+        return
     match = possible_matches[idx]
     minutes = duration // 60
     text_match(user, match, minutes)
