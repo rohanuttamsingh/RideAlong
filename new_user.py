@@ -67,12 +67,13 @@ def handle_new_user():
         if duration < min_duration:
             idx, min_duration = i, duration
     if min_duration > 60: # No matches within 1 hour
-        text_no_match(user)
+        return
     else:
         match = possible_matches[idx]
         minutes = duration // 60
-        text_match(user, match, minutes)
-        text_match(match, user, minutes)
+        # text_match(user, match, minutes)
+        # text_match(match, user, minutes)
+        print(user, match, minutes)
 
 def get_distance_matrix(origin: str, destinations: List[str]):
     """
