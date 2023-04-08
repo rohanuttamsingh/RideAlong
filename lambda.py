@@ -63,7 +63,7 @@ def get_distance_matrix(origin: str, destinations: List[str]):
     return data
 
 def text_match(user: User, match: User, minutes: int):
-    message = f'{user.name}, Co-Ride found a match!'
+    message = f'{user.name}, CoRide found a match!'
     if match.type == Type.DRIVER:
         action = 'is driving'
     else:
