@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 import requests
 import os
 from dotenv import load_dotenv
@@ -29,9 +29,9 @@ users = [
     User(Type.RIDER, 'Peter', '8472120384', 'UMD', 'Salisbury, MD', None),
     User(Type.RIDER, 'Abhi', '1234567890', 'UMD', 'Ellicott City, MD', None),
     User(Type.RIDER, 'Bryan', '0987654321', 'UMD', 'Philadelphia, PA', None),
-    User(Type.DRIVER, 'Ryan', '8888888888', 'UMD', 'Columbia, MD', 2),
-    User(Type.DRIVER, 'TicketMaster', '9999999999', 'UMD', 'New York, NY', 3),
-    User(Type.DRIVER, 'OpenTicket', '2222222222', 'UMD', 'Salisbury, MD', 1),
+    User(Type.DRIVER, 'Ryan', '4435406776', 'UMD', 'Columbia, MD', 2),
+    User(Type.DRIVER, 'TicketMaster', '4435406776', 'UMD', 'New York, NY', 3),
+    User(Type.DRIVER, 'OpenTicket', '4435406776', 'UMD', 'Salisbury, MD', 1),
 ]
 
 
@@ -47,9 +47,12 @@ def handle_new_user(user: User):
     for i, duration in enumerate(durations):
         if duration < min_duration:
             idx, min_duration = i, duration
-    return possible_matches[idx]
+    match = possible_matches[idx]
+    minutes = duration // 60
+    text_match(user, match, minutes)
+    text_match(match, user, minutes)
 
-def get_distance_matrix(origin, destinations):
+def get_distance_matrix(origin: str, destinations: List[str]):
     """
     Returns the time in seconds for to get from one location to another using the google maps API.
     """
@@ -59,7 +62,18 @@ def get_distance_matrix(origin, destinations):
     data = response.json()
     return data
 
-def send_text(number, message):
+def text_match(user: User, match: User, minutes: int):
+    message = f'{user.name}, Co-Ride found a match!'
+    if match.type == Type.DRIVER:
+        action = 'is driving'
+    else:
+        action = 'needs a ride'
+    message += f' {match.name} {action} to {match.destination}, which is only {minutes} away from your destination, {user.destination}.'
+    message += f' Connect with {match.name} at {match.phone}.'
+    number = '+1' + user.phone
+    send_text(number, message)
+
+def send_text(number: str, message: str):
     """
     Sends a text message to number with body message
     Number must be a string and have +1 in front of it
@@ -71,6 +85,8 @@ def send_text(number, message):
         from_="+18339642490",
         to=number
     )
+    print(message.sid)
 
 # print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
-send_text("+14435406776", "Hi, from twilio and bitcamp")
+handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'New York, NY', None))
+handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'Scranton, PA', None))
