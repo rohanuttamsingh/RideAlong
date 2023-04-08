@@ -55,5 +55,5 @@ def confirm(phone_number: str):
         driver = user_table.iloc[latest_notification["Driver Row"]]
         send_text(
             driver.Phone,
-            f"You have been matched with a driver. {user.Name} is going to {user.Destination}. Their phone number is: {user.Phone}. Reply 'YES' to confirm the ride."
+            f"You have been matched with a driver. {driver.Name} is going to {driver.Destination}. Their phone number is: {driver.Phone}. Reply 'YES' to confirm the ride."
         )
