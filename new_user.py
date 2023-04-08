@@ -4,6 +4,7 @@ from typing import Optional, List
 import requests
 import os
 from dotenv import load_dotenv
+from utils import send_text
 from twilio.rest import Client
 
 load_dotenv()
@@ -72,20 +73,6 @@ def text_match(user: User, match: User, minutes: int):
     message += f' Connect with {match.name} at {match.phone}.'
     number = '+1' + user.phone
     send_text(number, message)
-
-def send_text(number: str, message: str):
-    """
-    Sends a text message to number with body message
-    Number must be a string and have +1 in front of it
-    ex. +16677015404
-    """
-    client = Client(ACCOUNT_TOKEN, AUTH_TOKEN)
-    message = client.messages.create(
-        body=message,
-        from_="+18339642490",
-        to=number
-    )
-    print(message.sid)
 
 # print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
 handle_new_user(User(Type.RIDER, 'Rider', '4435406776', 'UMD', 'New York, NY', None))
