@@ -4,9 +4,12 @@ from typing import Optional
 import requests
 import os
 from dotenv import load_dotenv
+from twilio.rest import Client
 
 load_dotenv()
 API_KEY = os.environ["API_KEY"]
+ACCOUNT_TOKEN = os.environ["ACCOUNT_TOKEN"]
+AUTH_TOKEN = os.environ["AUTH_TOKEN"]
 
 class Type(Enum):
     RIDER = 1
@@ -56,5 +59,18 @@ def get_distance_matrix(origin, destinations):
     data = response.json()
     return data
 
-# print(get_distance(["University of California, Berkeley", "Stanford University"], ["San Francisco, CA", "College Park, MD"]))
-print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
+def send_text(number, message):
+    """
+    Sends a text message to number with body message
+    Number must be a string and have +1 in front of it
+    ex. +16677015404
+    """
+    client = Client(ACCOUNT_TOKEN, AUTH_TOKEN)
+    message = client.messages.create(
+        body=message,
+        from_="+18339642490",
+        to=number
+    )
+
+# print(handle_new_user(User(Type.RIDER, 'Test', '123', 'UMD', 'New York, NY', None)))
+send_text("+14435406776", "Hi, from twilio and bitcamp")
