@@ -6,15 +6,17 @@ from utils import read_table
 from new_user import send_request
 
 
-def confirm(phone_number: str):
+def confirm(event, _):
     """
     Receives and processes a response from a rider.
 
-    Args:
-        phone_number: The phone number of the rider.
+    Params:
+        phone: The phone number of the rider.
     """
+    phone_number = event['phone']
     # Remove the leading +1.
-    phone_number = phone_number[2:]
+    if "+1" in phone_number:
+        phone_number = phone_number[2:]
 
     # Read our database.
     user_table = read_table('Users')

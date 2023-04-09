@@ -75,6 +75,19 @@ def handle_new_user():
         minutes = duration // 60
         print(user, match, minutes)
 
+        # Check if the match is a driver.
+        if match.type == Type.DRIVER:
+            driver = match
+            rider = user
+        else:
+            driver = user
+            rider = match
+
+        requests.post("https://hooks.zapier.com/hooks/catch/13745389/32g4uuy/", json={
+            "rider_row": user.name,
+            "driver_row": match.name,
+        })
+
 def get_distance_matrix(origin: str, destinations: List[str]):
     """
     Returns the time in seconds for to get from one location to another using the google maps API.
