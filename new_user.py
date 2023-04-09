@@ -81,7 +81,7 @@ def handle_new_user():
         message += f' {driver.name} is driving on {driver.date} to {driver.destination}, which is only {minutes} away from your destination, {rider.destination}.'
         message += f' Connect with {driver.name} at {driver.phone}.'
         message += f' Reply with YES to confirm this CoRide.'
-        number = '+1' + rider.phone
+        number = f"+1{rider.phone}"
         send_request(message, number)
         requests.post("https://hooks.zapier.com/hooks/catch/13745389/32g4uuy/", json={
             "rider_row": rider.name,
