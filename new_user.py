@@ -82,18 +82,9 @@ def handle_new_user():
         message += f' Connect with {driver.name} at {driver.phone}.'
         number = '+1' + rider.phone
         send_request(message, number)
-
-        # Check if the match is a driver.
-        if match.type == Type.DRIVER:
-            driver = match
-            rider = user
-        else:
-            driver = user
-            rider = match
-
         requests.post("https://hooks.zapier.com/hooks/catch/13745389/32g4uuy/", json={
-            "rider_row": user.name,
-            "driver_row": match.name,
+            "rider_row": rider.name,
+            "driver_row": driver.name,
         })
 
 def get_distance_matrix(origin: str, destinations: List[str]):
