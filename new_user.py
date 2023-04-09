@@ -85,7 +85,7 @@ def handle_new_user():
             rider, driver = user, match
         else:
             rider, driver = match, user
-        minutes = duration // 60
+        minutes = min_duration // 60
         message = f'{rider.name}, CoRide found a match!'
         message += f' {driver.name} is driving on {driver.date} to {driver.destination}, which is only {minutes} minutes away from your destination, {rider.destination}.'
         message += f' Reply with YES to confirm this CoRide.'
