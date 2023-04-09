@@ -18,6 +18,7 @@ class Type(Enum):
 
 @dataclass
 class User:
+    row: int
     type: Type
     name: str
     phone: str
@@ -44,7 +45,8 @@ def create_user_from_row(row) -> User:
         date = datetime.date(year, month, day)
     else:
         date = None
-    return User(type, row['Name'], row['Phone'], row['School'], row['Destination'], seats, date)
+    return User(row.name, type, row['Name'], row['Phone'], row['School'], row['Destination'], seats, date)
+
 
 def get_users_list() -> List[User]:
     users_df = get_users()
@@ -84,8 +86,8 @@ def handle_new_user():
         number = f"+1{rider.phone}"
         send_request(message, number)
         requests.post("https://hooks.zapier.com/hooks/catch/13745389/32g4uuy/", json={
-            "rider_row": rider.name,
-            "driver_row": driver.name,
+            "rider_row": rider.row,
+            "driver_row": driver.row,
         })
 
 def get_distance_matrix(origin: str, destinations: List[str]):

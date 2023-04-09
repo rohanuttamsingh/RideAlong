@@ -26,7 +26,6 @@ def confirm(event, _):
 
     # Find the corresponding user.
     users = user_table[user_table['Phone'] == phone_number]
-    print(users)
 
     latest_notification = {
         "name": -1,
