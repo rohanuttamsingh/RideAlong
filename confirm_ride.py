@@ -23,12 +23,10 @@ def confirm(event, _):
     # Convert phone numbers to strings.
     user_table["Phone"] = user_table["Phone"].astype(str)
     notification_table = read_table('Notifications')
-    # Subtract two from the row index to account for the header.
-    notification_table["Driver Row"] -= 2
-    notification_table["Rider Row"] -= 2
 
     # Find the corresponding user.
     users = user_table[user_table['Phone'] == phone_number]
+    print(users)
 
     latest_notification = {
         "name": -1,
