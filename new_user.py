@@ -65,12 +65,17 @@ def handle_new_user():
     possible_matches = list(filter(cond, users))
     match_destinations = [match.destination for match in possible_matches]
     distance_matrix = get_distance_matrix(user.destination, match_destinations)
-    durations = [el['duration']['value'] for el in distance_matrix['rows'][0]['elements']]
+    durations = []
+    for el in distance_matrix['rows'][0]['elements']:
+        if el['status'] == 'ZERO_RESULTS':
+            durations.append(None)
+        else:
+            durations.append(el['duration']['value'])
     idx, min_duration = 0, durations[0]
     for i, duration in enumerate(durations):
-        if duration < min_duration:
+        if duration is not None and duration < min_duration:
             idx, min_duration = i, duration
-    if min_duration > 60: # No matches within 1 hour
+    if min_duration is not None and min_duration > 60: # No matches within 1 hour
         return
     else:
         match = possible_matches[idx]
@@ -80,8 +85,7 @@ def handle_new_user():
             rider, driver = match, user
         minutes = duration // 60
         message = f'{rider.name}, CoRide found a match!'
-        message += f' {driver.name} is driving on {driver.date} to {driver.destination}, which is only {minutes} away from your destination, {rider.destination}.'
-        message += f' Connect with {driver.name} at {driver.phone}.'
+        message += f' {driver.name} is driving on {driver.date} to {driver.destination}, which is only {minutes} minutes away from your destination, {rider.destination}.'
         message += f' Reply with YES to confirm this CoRide.'
         number = f"+1{rider.phone}"
         send_request(message, number)
