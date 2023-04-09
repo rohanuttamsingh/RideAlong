@@ -27,9 +27,7 @@ def confirm(event, _):
     # Find the corresponding user.
     users = user_table[user_table['Phone'] == phone_number]
 
-    latest_notification = {
-        "name": -1,
-    }
+    latest_notification = None
     # Find the latest notification corresponding to this user.
     for _, user in users.iterrows():
         # Get the row index of this user.
@@ -37,11 +35,13 @@ def confirm(event, _):
 
         # Get the latest notification for this user.
         driver_notification = notification_table[notification_table["Driver Row"] == user_index]
-        if len(driver_notification) > 0 and driver_notification.iloc[-1].name > latest_notification["name"]:
+        if len(driver_notification) > 0 and (
+                latest_notification is None or driver_notification.iloc[-1].name > latest_notification.name):
             latest_notification = driver_notification.iloc[-1]
 
         rider_notification = notification_table[notification_table["Rider Row"] == user_index]
-        if len(rider_notification) > 0 and rider_notification.iloc[-1].name > latest_notification["name"]:
+        if len(rider_notification) > 0 and (
+                latest_notification is None or rider_notification.iloc[-1].name > latest_notification.name):
             latest_notification = rider_notification.iloc[-1]
 
     if "Driver Row" not in latest_notification:
