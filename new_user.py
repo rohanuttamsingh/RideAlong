@@ -75,9 +75,11 @@ def handle_new_user():
     for i, duration in enumerate(durations):
         if duration is not None and duration < min_duration:
             idx, min_duration = i, duration
-    if min_duration is not None and min_duration > 60: # No matches within 1 hour
+    if min_duration is not None and min_duration > 60 * 60: # No matches within 1 hour
+        print('No match found')
         return
     else:
+        print('Match found')
         match = possible_matches[idx]
         if user.type == Type.RIDER:
             rider, driver = user, match
