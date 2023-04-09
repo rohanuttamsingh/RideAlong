@@ -72,8 +72,16 @@ def handle_new_user():
         return
     else:
         match = possible_matches[idx]
+        if user.type == Type.RIDER:
+            rider, driver = user, match
+        else:
+            rider, driver = match, user
         minutes = duration // 60
-        print(user, match, minutes)
+        message = f'{rider.name}, CoRide found a match!'
+        message += f' {driver.name} is driving on {driver.date} to {driver.destination}, which is only {minutes} away from your destination, {rider.destination}.'
+        message += f' Connect with {driver.name} at {driver.phone}.'
+        number = '+1' + rider.phone
+        send_request(message, number)
 
         # Check if the match is a driver.
         if match.type == Type.DRIVER:
